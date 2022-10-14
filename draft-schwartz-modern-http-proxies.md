@@ -19,11 +19,11 @@
 # Change the file extension to match the format (.xml for XML, etc...)
 #
 ###
-title: "TODO - Your title"
+title: "Modernizing HTTP Proxies etc."
 abbrev: "TODO - Abbreviation"
 category: info
 
-docname: draft-todo-yourname-protocol-latest
+docname: draft-schwartz-modern-http-proxies-latest
 submissiontype: IETF  # also: "independent", "IAB", or "IRTF"
 number:
 date:
