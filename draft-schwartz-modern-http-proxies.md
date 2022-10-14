@@ -35,11 +35,11 @@ HTTP proxying features have long been part of the core HTTP specification.  Howe
 
 ## History
 
-An HTTP forward proxy (or just "proxy" in the HTTP standards) is an HTTP service that acts on behalf of the client as an intermediary for some or all HTTP requests.  HTTP/1.0 {{?RFC1945}} defines the initial HTTP proxying mechanism: the client formats its request target in "absolute form" (i.e. with a full URI in the Request-Line) and delivers it to the proxy, which reissues it to the origin specified in the URI.  In this specification, we call this behavior an "HTTP request proxy".
+An HTTP forward proxy (or just "proxy" in the HTTP standards) is an HTTP service that acts on behalf of the client as an intermediary for some or all HTTP requests.  HTTP/1.0 defines the initial HTTP proxying mechanism: the client formats its request target in "absolute form" (i.e. with a full URI in the Request-Line) and delivers it to the proxy, which reissues it to the origin specified in the URI ({{?RFC1945, Section 5.1.2}}).  In this specification, we call this behavior an "HTTP request proxy".
 
-With the introduction of "https" URIs, a new proxying mechanism was needed to enable TLS connections to traverse the proxy.  To enable this, HTTP/1.1 introduced the CONNECT method.  In this method, the request target specifies a host and port number, and the proxy forwards TCP payloads between the client and this destination.  In this specification, we call this behavior a "TCP transport proxy".
+With the introduction of "https" URIs, a new proxying mechanism was needed to enable TLS connections to traverse the proxy.  To enable this, HTTP/1.1 introduced the CONNECT method.  In this method, the request target specifies a host and port number, and the proxy forwards TCP payloads between the client and this destination ({{?RFC9110, Section 9.3.6}}).  In this specification, we call this behavior a "TCP transport proxy".
 
-These two methods sufficed until the introduction of HTTP/3, which uses a UDP transport.  The MASQUE effort has filled the gap by defining proxy mechanisms that are capable of proxying UDP datagrams {{?RFC9298}}, and more generally IP datagrams {{?I-D.ietf-masque-connect-ip}}.  The destination host and port number (if applicable) are encoded into the HTTP resource path, and end-to-end datagrams are wrapped into HTTP Datagrams on the client-proxy path.
+These two methods sufficed until the introduction of HTTP/3, which uses a UDP transport.  The MASQUE effort has filled the gap by defining proxy mechanisms that are capable of proxying UDP datagrams {{?RFC9298}}, and more generally IP datagrams {{?I-D.ietf-masque-connect-ip}}.  The destination host and port number (if applicable) are encoded into the HTTP resource path, and end-to-end datagrams are wrapped into HTTP Datagrams {{?RFC9297}} on the client-proxy path.
 
 ## Problems
 
@@ -94,7 +94,7 @@ Notes on this example:
 
 # Modern TCP transport proxies
 
-A modern TCP transport proxy for HTTP is identified by a URI Template containing variables named "target_host" and "tcp_port".  The client substitutes the destination host and port number into these variables to produce the request URI.
+A modern TCP transport proxy for HTTP is identified by a URI Template {{!RFC6570}} containing variables named "target_host" and "tcp_port".  The client substitutes the destination host and port number into these variables to produce the request URI.
 
 The "target_host" variable MUST be a domain name, an IP address literal, or a list of IP addresses.  The "tcp_port" variable MUST be a single integer.  If "target_host" is a list (as in {{Section 2.4.2 of !RFC6570}}), the server SHOULD perform the same connection procedure as if these addresses had been returned in response to A and AAAA queries for a domain name.
 
@@ -154,13 +154,15 @@ From this point on, the request and response streams SHALL conform to all the us
 The names of the variables in the URI Template uniquely identify the capabilities of the proxy.  Undefined variables are permitted in URI Templates, so a single template can be used for multiple purposes:
 
 ~~~
-Combined request and TCP proxy:
+Combined HTTP request and TCP transport proxy:
 https://example.com/proxy{?target_uri,target_host,tcp_port}
 
-Combined request, IP, TCP, UDP proxy and DoH server:
-https://proxy.example/{?target_uri,target_host,tcp_port,port,target,dns}
+Combined HTTP, TCP, UDP, and IP proxy with DoH server:
+https://proxy.example/{?target_uri,target_host,tcp_port,port,target,ipproto,dns}
 ~~~
 {: title="Multipurpose templates"}
+
+Multipurpose templates can be useful when a single client may benefit from access to multiple complementary services (e.g. TCP and UDP), or when the proxy is used by a variety of clients with different needs.
 
 ## Sample exchanges
 
@@ -187,6 +189,18 @@ CONNECT HTTP/2.0
 ...
 ~~~
 {: title="Use of a TCP transport proxy through an HTTP request proxy"}
+
+Modern TCP transport proxies support requests that offer multiple IP addresses:
+
+~~~ http-message
+CONNECT HTTP/2.0
+:authority = request-proxy.example
+:scheme = https
+:path = /proxy?target_host=192.0.2.1,2001:db8::1&port=443
+:protocol = connect-tcp
+...
+~~~
+{: title="TCP transport proxy request with multiple IP addresses"}
 
 # Security Considerations
 
