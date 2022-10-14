@@ -1212,9 +1212,9 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
         <h3 id="name-history">
 <a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-history" class="section-name selfRef">History</a>
         </h3>
-<p id="section-1.1-1">An HTTP forward proxy (or just "proxy" in the HTTP standards) is an HTTP service that acts on behalf of the client as an intermediary for some or all HTTP requests.  HTTP/1.0 <span>[<a href="#RFC1945" class="cite xref">RFC1945</a>]</span> defines the initial HTTP proxying mechanism: the client formats its request target in "absolute form" (i.e. with a full URI in the Request-Line) and delivers it to the proxy, which reissues it to the origin specified in the URI.  In this specification, we call this behavior an "HTTP request proxy".<a href="#section-1.1-1" class="pilcrow">¶</a></p>
-<p id="section-1.1-2">With the introduction of "https" URIs, a new proxying mechanism was needed to enable TLS connections to traverse the proxy.  To enable this, HTTP/1.1 introduced the CONNECT method.  In this method, the request target specifies a host and port number, and the proxy forwards TCP payloads between the client and this destination.  In this specification, we call this behavior a "TCP transport proxy".<a href="#section-1.1-2" class="pilcrow">¶</a></p>
-<p id="section-1.1-3">These two methods sufficed until the introduction of HTTP/3, which uses a UDP transport.  The MASQUE effort has filled the gap by defining proxy mechanisms that are capable of proxying UDP datagrams <span>[<a href="#RFC9298" class="cite xref">RFC9298</a>]</span>, and more generally IP datagrams <span>[<a href="#I-D.ietf-masque-connect-ip" class="cite xref">I-D.ietf-masque-connect-ip</a>]</span>.  The destination host and port number (if applicable) are encoded into the HTTP resource path, and end-to-end datagrams are wrapped into HTTP Datagrams on the client-proxy path.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
+<p id="section-1.1-1">An HTTP forward proxy (or just "proxy" in the HTTP standards) is an HTTP service that acts on behalf of the client as an intermediary for some or all HTTP requests.  HTTP/1.0 defines the initial HTTP proxying mechanism: the client formats its request target in "absolute form" (i.e. with a full URI in the Request-Line) and delivers it to the proxy, which reissues it to the origin specified in the URI (<span>[<a href="#RFC1945" class="cite xref">RFC1945</a>], <a href="https://rfc-editor.org/rfc/rfc1945#section-5.1.2" class="relref">Section 5.1.2</a></span>).  In this specification, we call this behavior an "HTTP request proxy".<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+<p id="section-1.1-2">With the introduction of "https" URIs, a new proxying mechanism was needed to enable TLS connections to traverse the proxy.  To enable this, HTTP/1.1 introduced the CONNECT method.  In this method, the request target specifies a host and port number, and the proxy forwards TCP payloads between the client and this destination (<span>[<a href="#RFC9110" class="cite xref">RFC9110</a>], <a href="https://rfc-editor.org/rfc/rfc9110#section-9.3.6" class="relref">Section 9.3.6</a></span>).  In this specification, we call this behavior a "TCP transport proxy".<a href="#section-1.1-2" class="pilcrow">¶</a></p>
+<p id="section-1.1-3">These two methods sufficed until the introduction of HTTP/3, which uses a UDP transport.  The MASQUE effort has filled the gap by defining proxy mechanisms that are capable of proxying UDP datagrams <span>[<a href="#RFC9298" class="cite xref">RFC9298</a>]</span>, and more generally IP datagrams <span>[<a href="#I-D.ietf-masque-connect-ip" class="cite xref">I-D.ietf-masque-connect-ip</a>]</span>.  The destination host and port number (if applicable) are encoded into the HTTP resource path, and end-to-end datagrams are wrapped into HTTP Datagrams <span>[<a href="#RFC9297" class="cite xref">RFC9297</a>]</span> on the client-proxy path.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="problems">
@@ -1300,7 +1300,7 @@ Proxy-Authorization: ...
       <h2 id="name-modern-tcp-transport-proxie">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-modern-tcp-transport-proxie" class="section-name selfRef">Modern TCP transport proxies</a>
       </h2>
-<p id="section-4-1">A modern TCP transport proxy for HTTP is identified by a URI Template containing variables named "target_host" and "tcp_port".  The client substitutes the destination host and port number into these variables to produce the request URI.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-1">A modern TCP transport proxy for HTTP is identified by a URI Template <span>[<a href="#RFC6570" class="cite xref">RFC6570</a>]</span> containing variables named "target_host" and "tcp_port".  The client substitutes the destination host and port number into these variables to produce the request URI.<a href="#section-4-1" class="pilcrow">¶</a></p>
 <p id="section-4-2">The "target_host" variable <span class="bcp14">MUST</span> be a domain name, an IP address literal, or a list of IP addresses.  The "tcp_port" variable <span class="bcp14">MUST</span> be a single integer.  If "target_host" is a list (as in <span><a href="https://rfc-editor.org/rfc/rfc6570#section-2.4.2" class="relref">Section 2.4.2</a> of [<a href="#RFC6570" class="cite xref">RFC6570</a>]</span>), the server <span class="bcp14">SHOULD</span> perform the same connection procedure as if these addresses had been returned in response to A and AAAA queries for a domain name.<a href="#section-4-2" class="pilcrow">¶</a></p>
 <div id="in-http11">
 <section id="section-4.1">
@@ -1394,16 +1394,17 @@ Upgrade: connect-tcp
 <span id="name-multipurpose-templates"></span><figure id="figure-2">
           <div class="alignLeft art-text artwork" id="section-5.1-2.1">
 <pre>
-Combined request and TCP proxy:
+Combined HTTP request and TCP transport proxy:
 https://example.com/proxy{?target_uri,target_host,tcp_port}
 
-Combined request, IP, TCP, UDP proxy and DoH server:
-https://proxy.example/{?target_uri,target_host,tcp_port,port,target,dns}
+Combined HTTP, TCP, UDP, and IP proxy with DoH server:
+https://proxy.example/{?target_uri,target_host,tcp_port,port,target,ipproto,dns}
 </pre>
 </div>
 <figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
 <a href="#name-multipurpose-templates" class="selfRef">Multipurpose templates</a>
           </figcaption></figure>
+<p id="section-5.1-3">Multipurpose templates can be useful when a single client may benefit from access to multiple complementary services (e.g. TCP and UDP), or when the proxy is used by a variety of clients with different needs.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sample-exchanges">
@@ -1440,6 +1441,21 @@ CONNECT HTTP/2.0
 </div>
 <figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
 <a href="#name-use-of-a-tcp-transport-prox" class="selfRef">Use of a TCP transport proxy through an HTTP request proxy</a>
+          </figcaption></figure>
+<p id="section-5.2-5">Modern TCP transport proxies support requests that offer multiple IP addresses:<a href="#section-5.2-5" class="pilcrow">¶</a></p>
+<span id="name-tcp-transport-proxy-request"></span><figure id="figure-5">
+          <div id="section-5.2-6.1">
+<pre class="lang-http-message sourcecode">
+CONNECT HTTP/2.0
+:authority = request-proxy.example
+:scheme = https
+:path = /proxy?target_host=192.0.2.1,2001:db8::1&amp;port=443
+:protocol = connect-tcp
+...
+</pre>
+</div>
+<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
+<a href="#name-tcp-transport-proxy-request" class="selfRef">TCP transport proxy request with multiple IP addresses</a>
           </figcaption></figure>
 </section>
 </div>
@@ -1522,6 +1538,14 @@ CONNECT HTTP/2.0
 <dt id="RFC1945">[RFC1945]</dt>
         <dd>
 <span class="refAuthor">Berners-Lee, T.</span>, <span class="refAuthor">Fielding, R.</span>, and <span class="refAuthor">H. Frystyk</span>, <span class="refTitle">"Hypertext Transfer Protocol -- HTTP/1.0"</span>, <span class="seriesInfo">RFC 1945</span>, <span class="seriesInfo">DOI 10.17487/RFC1945</span>, <time datetime="1996-05" class="refDate">May 1996</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc1945">https://www.rfc-editor.org/rfc/rfc1945</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9110">[RFC9110]</dt>
+        <dd>
+<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP Semantics"</span>, <span class="seriesInfo">STD 97</span>, <span class="seriesInfo">RFC 9110</span>, <span class="seriesInfo">DOI 10.17487/RFC9110</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9110">https://www.rfc-editor.org/rfc/rfc9110</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9297">[RFC9297]</dt>
+        <dd>
+<span class="refAuthor">Schinazi, D.</span> and <span class="refAuthor">L. Pardue</span>, <span class="refTitle">"HTTP Datagrams and the Capsule Protocol"</span>, <span class="seriesInfo">RFC 9297</span>, <span class="seriesInfo">DOI 10.17487/RFC9297</span>, <time datetime="2022-08" class="refDate">August 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9297">https://www.rfc-editor.org/rfc/rfc9297</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9298">[RFC9298]</dt>
       <dd>
