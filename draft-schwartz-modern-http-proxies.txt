@@ -4,8 +4,8 @@
 
 httpbis                                                   B. M. Schwartz
 Internet-Draft                                                Google LLC
-Intended status: Standards Track                         14 October 2022
-Expires: 17 April 2023
+Intended status: Standards Track                         18 October 2022
+Expires: 21 April 2023
 
 
               Modernizing HTTP Forward Proxy Functionality
@@ -36,7 +36,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 17 April 2023.
+   This Internet-Draft will expire on 21 April 2023.
 
 Copyright Notice
 
@@ -69,7 +69,7 @@ Table of Contents
      5.1.  Template expansion
      5.2.  Sample exchanges
    6.  Security Considerations
-   7.  Operational considerations
+   7.  Operational Considerations
    8.  IANA Considerations
    9.  References
      9.1.  Normative References
@@ -187,8 +187,8 @@ Table of Contents
       but the Host header (or :authority in HTTP/2 and HTTP/3) is
       altered.
 
-   *  Certain characers in the target URI are percent-encoded during URI
-      Template expansion.
+   *  Certain characters in the target URI are percent-encoded during
+      URI Template expansion.
 
    *  The scheme, which is implicit in the original request, is explicit
       in the transformed request.  The scheme in this example is
@@ -347,7 +347,7 @@ https://proxy.example/{?target_uri,target_host,tcp_port,port,target,ipproto,dns}
    CONNECT HTTP/2.0
    :authority = request-proxy.example
    :scheme = https
-   :path = /proxy?target_host=192.0.2.1,2001:db8::1&port=443
+   :path = /proxy?target_host=192.0.2.1,2001:db8::1&tcp_port=443
    :protocol = connect-tcp
    ...
 
@@ -357,12 +357,12 @@ https://proxy.example/{?target_uri,target_host,tcp_port,port,target,ipproto,dns}
 
    None
 
-7.  Operational considerations
+7.  Operational Considerations
 
    Modern HTTP proxies can make use of standard HTTP gateways and path-
    routing to ease implementation and allow use of shared
    infrastructure.  However, current gateways might need modifications
-   to support these services.  A compatible gateway must:
+   to support these services.  To be compatible, a gateway must:
 
    *  support Extended CONNECT.
 
