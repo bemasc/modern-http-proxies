@@ -88,7 +88,7 @@ Notes on this example:
 
 * The HTTP method is not altered.
 * The request-related headers such as Content-Type are preserved, but the Host header (or :authority in HTTP/2 and HTTP/3) is altered.
-* Certain characers in the target URI are percent-encoded during URI Template expansion.
+* Certain characters in the target URI are percent-encoded during URI Template expansion.
 * The scheme, which is implicit in the original request, is explicit in the transformed request.  The scheme in this example is "https", indicating that the client is asking the proxy to establish a secure connection to the target.
 * The client can add Proxy-* headers to communicate with the proxy.
 
@@ -196,7 +196,7 @@ Modern TCP transport proxies support requests that offer multiple IP addresses:
 CONNECT HTTP/2.0
 :authority = request-proxy.example
 :scheme = https
-:path = /proxy?target_host=192.0.2.1,2001:db8::1&port=443
+:path = /proxy?target_host=192.0.2.1,2001:db8::1&tcp_port=443
 :protocol = connect-tcp
 ...
 ~~~
@@ -206,9 +206,9 @@ CONNECT HTTP/2.0
 
 None
 
-# Operational considerations
+# Operational Considerations
 
-Modern HTTP proxies can make use of standard HTTP gateways and path-routing to ease implementation and allow use of shared infrastructure.  However, current gateways might need modifications to support these services.  A compatible gateway must:
+Modern HTTP proxies can make use of standard HTTP gateways and path-routing to ease implementation and allow use of shared infrastructure.  However, current gateways might need modifications to support these services.  To be compatible, a gateway must:
 
 * support Extended CONNECT.
 * convert HTTP/1.1 Upgrade requests into Extended CONNECT.
