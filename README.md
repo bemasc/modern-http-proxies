@@ -1,6 +1,15 @@
-# Modernizing HTTP Forward Proxy Functionality
+# HTTPBIS Drafts
 
-This is the working area for the individual Internet-Draft, "Modernizing HTTP Forward Proxy Functionality".
+This is the working area for individual Internet-Drafts.
+
+## Template-Driven HTTP CONNECT Proxying for TCP
+
+* [Editor's Copy](https://bemasc.github.io/modern-http-proxies/#go.draft-schwartz-httpbis-connect-tcp.html)
+* [Datatracker Page](https://datatracker.ietf.org/doc/draft-schwartz-httpbis-connect-tcp)
+* [Individual Draft](https://datatracker.ietf.org/doc/html/draft-schwartz-httpbis-connect-tcp)
+* [Compare Editor's Copy to Individual Draft](https://bemasc.github.io/modern-http-proxies/#go.draft-schwartz-httpbis-connect-tcp.diff)
+
+## Modernizing HTTP Forward Proxy Functionality
 
 * [Editor's Copy](https://bemasc.github.io/modern-http-proxies/#go.draft-schwartz-modern-http-proxies.html)
 * [Datatracker Page](https://datatracker.ietf.org/doc/draft-schwartz-modern-http-proxies)
