@@ -4,8 +4,8 @@
 
 httpbis                                                   B. M. Schwartz
 Internet-Draft                                                Google LLC
-Intended status: Standards Track                        11 November 2022
-Expires: 15 May 2023
+Intended status: Standards Track                        14 November 2022
+Expires: 18 May 2023
 
 
              Template-Driven HTTP CONNECT Proxying for TCP
@@ -35,7 +35,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 15 May 2023.
+   This Internet-Draft will expire on 18 May 2023.
 
 Copyright Notice
 
@@ -61,6 +61,7 @@ Table of Contents
    3.  Specification
      3.1.  In HTTP/1.1
      3.2.  In HTTP/2 and HTTP/3
+     3.3.  Use of 100 (Continue)
    4.  Applicability
      4.1.  Servers
      4.2.  Clients
@@ -86,10 +87,10 @@ Table of Contents
    this specification, this is referred to as a "classic HTTP CONNECT
    proxy".
 
-   HTTP/3 uses a UDP transport, so the pre-existing CONNECT mechanism
-   was not applicable.  To enable forward proxying of HTTP/3, the MASQUE
-   effort has defined proxy mechanisms that are capable of proxying UDP
-   datagrams [RFC9298], and more generally IP datagrams
+   HTTP/3 uses a UDP transport, so it cannot be forwarded using the pre-
+   existing CONNECT mechanism.  To enable forward proxying of HTTP/3,
+   the MASQUE effort has defined proxy mechanisms that are capable of
+   proxying UDP datagrams [RFC9298], and more generally IP datagrams
    [I-D.ietf-masque-connect-ip].  The destination host and port number
    (if applicable) are encoded into the HTTP resource path, and end-to-
    end datagrams are wrapped into HTTP Datagrams [RFC9297] on the
@@ -97,20 +98,20 @@ Table of Contents
 
 1.2.  Problems
 
-   Classic HTTP CONNECT proxies are identified by an origin, not a URI.
-   The proxy service does not have a path of its own.  This prevents any
-   origin from hosting multiple distinct proxy services and makes it
-   difficult to manage a proxy service in a fashion similar to other
-   HTTP services.
+   Classic HTTP CONNECT proxies are identified by an origin.  The proxy
+   does not have a path of its own.  This prevents any origin from
+   hosting multiple distinct proxy services.
 
-   In some circumstances, it may be possible to work around this
-   limitation by hosting many origins on a single server IP address
-   (i.e., virtual-hosting).  In HTTP/1.1, the "Host" header enables such
-   virtual-hosting by distinguishing the hostname of the proxy (in the
-   Host header) from the hostname of the destination (in the request
-   target).  However, in HTTP/2 and HTTP/3, this distinction no longer
-   exists.  As a result, classic HTTP CONNECT proxies are not compatible
-   with virtual-hosting in HTTP/2 or HTTP/3.
+   Ordinarily, HTTP allows multiple origin hostnames to share a single
+   server IP address and port number (i.e., virtual-hosting), by
+   specifying the applicable hostname in the "Host" or ":authority"
+   header field.  However, classic HTTP CONNECT proxies use these fields
+   to indicate the CONNECT request's destination ([RFC9112],
+   Section 3.2.3), leaving no way to determine the proxy's origin from
+   the request.  As a result, classic HTTP CONNECT proxies cannot be
+   deployed using virtual-hosting, nor can they apply the usual defenses
+   against server port misdirection attacks (see Section 7.4 of
+   [RFC9110]).
 
    Classic HTTP CONNECT proxies can be used to reach a target host that
    is specified as a domain name or an IP address.  However, because
@@ -185,7 +186,7 @@ Table of Contents
 
    If the request is malformed or impermissible, the proxy MUST return a
    4XX error code.  If a TCP connection was not established, the proxy
-   MUST NOT return a 101 or 2XX status code.
+   MUST NOT switch protocols to "connect-tcp".
 
    From this point on, the connection SHALL confirm to all the usual
    requirements for classic CONNECT proxies in HTTP/1.1 ([RFC9110],
@@ -238,6 +239,16 @@ Table of Contents
    ...
 
               Figure 2: Templated TCP proxy example in HTTP/2
+
+3.3.  Use of 100 (Continue)
+
+   This protocol is compatible with the use of an "Expect: 100-continue"
+   request header ([RFC9110], Section 10.1.1) in any HTTP version.  The
+   "100 Continue" response confirms receipt of a request at the proxy
+   without waiting for the proxy-destination TCP handshake to succeed or
+   fail.  This may be particularly helpful when the destination host is
+   not responding, as TCP handshakes can hang for several minutes before
+   failing.
 
 4.  Applicability
 
@@ -351,6 +362,10 @@ Table of Contents
               connect-ip-03, 27 September 2022,
               <https://datatracker.ietf.org/doc/html/draft-ietf-masque-
               connect-ip-03>.
+
+   [RFC9112]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
+              Ed., "HTTP/1.1", STD 99, RFC 9112, DOI 10.17487/RFC9112,
+              June 2022, <https://www.rfc-editor.org/rfc/rfc9112>.
 
    [RFC9297]  Schinazi, D. and L. Pardue, "HTTP Datagrams and the
               Capsule Protocol", RFC 9297, DOI 10.17487/RFC9297, August
