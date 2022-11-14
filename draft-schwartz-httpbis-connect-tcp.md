@@ -40,13 +40,13 @@ TCP proxying using HTTP CONNECT has long been part of the core HTTP specificatio
 
 HTTP has used the CONNECT method for proxying TCP connections since HTTP/1.1.  When using CONNECT, the request target specifies a host and port number, and the proxy forwards TCP payloads between the client and this destination ({{?RFC9110, Section 9.3.6}}).  To date, this is the only mechanism defined for proxying TCP over HTTP.  In this specification, this is referred to as a "classic HTTP CONNECT proxy".
 
-HTTP/3 uses a UDP transport, so the pre-existing CONNECT mechanism was not applicable.  To enable forward proxying of HTTP/3, the MASQUE effort has defined proxy mechanisms that are capable of proxying UDP datagrams {{?RFC9298}}, and more generally IP datagrams {{?I-D.ietf-masque-connect-ip}}.  The destination host and port number (if applicable) are encoded into the HTTP resource path, and end-to-end datagrams are wrapped into HTTP Datagrams {{?RFC9297}} on the client-proxy path.
+HTTP/3 uses a UDP transport, so it cannot be forwarded using the pre-existing CONNECT mechanism.  To enable forward proxying of HTTP/3, the MASQUE effort has defined proxy mechanisms that are capable of proxying UDP datagrams {{?RFC9298}}, and more generally IP datagrams {{?I-D.ietf-masque-connect-ip}}.  The destination host and port number (if applicable) are encoded into the HTTP resource path, and end-to-end datagrams are wrapped into HTTP Datagrams {{?RFC9297}} on the client-proxy path.
 
 ## Problems
 
-Classic HTTP CONNECT proxies are identified by an origin, not a URI.  The proxy service does not have a path of its own.  This prevents any origin from hosting multiple distinct proxy services and makes it difficult to manage a proxy service in a fashion similar to other HTTP services.
+Classic HTTP CONNECT proxies are identified by an origin.  The proxy does not have a path of its own.  This prevents any origin from hosting multiple distinct proxy services.
 
-In some circumstances, it may be possible to work around this limitation by hosting many origins on a single server IP address (i.e., virtual-hosting).  In HTTP/1.1, the "Host" header enables such virtual-hosting by distinguishing the hostname of the proxy (in the Host header) from the hostname of the destination (in the request target).  However, in HTTP/2 and HTTP/3, this distinction no longer exists.  As a result, classic HTTP CONNECT proxies are not compatible with virtual-hosting in HTTP/2 or HTTP/3.
+Ordinarily, HTTP allows multiple origin hostnames to share a single server IP address and port number (i.e., virtual-hosting), by specifying the applicable hostname in the "Host" or ":authority" header field.  However, classic HTTP CONNECT proxies use these fields to indicate the CONNECT request's destination ({{?RFC9112, Section 3.2.3}}), leaving no way to determine the proxy's origin from the request.  As a result, classic HTTP CONNECT proxies cannot be deployed using virtual-hosting, nor can they apply the usual defenses against server port misdirection attacks (see {{Section 7.4 of ?RFC9110}}).
 
 Classic HTTP CONNECT proxies can be used to reach a target host that is specified as a domain name or an IP address.  However, because only a single target host can be specified, proxy-driven Happy Eyeballs and cross-IP fallback can only be used when the host is a domain name.  For IP-targeted requests to succeed, the client must know which address families are supported by the proxy via some out-of-band mechanism, or open multiple independent CONNECT requests and abandon any that prove unnecessary.
 
@@ -80,7 +80,7 @@ If the request is well-formed and permissible, the proxy MUST attempt the TCP co
 * The response SHALL include a Connection header field with the value "Upgrade".
 * The response SHALL include a single Upgrade header field with the value "connect-tcp".
 
-If the request is malformed or impermissible, the proxy MUST return a 4XX error code.  If a TCP connection was not established, the proxy MUST NOT return a 101 or 2XX status code.
+If the request is malformed or impermissible, the proxy MUST return a 4XX error code.  If a TCP connection was not established, the proxy MUST NOT switch protocols to "connect-tcp".
 
 From this point on, the connection SHALL confirm to all the usual requirements for classic CONNECT proxies in HTTP/1.1 ({{!RFC9110, Section 9.3.6}}).  Additionally, if the proxy observes a connection error from the client (e.g., a TCP RST, TCP timeout, or TLS error), it SHOULD send a TCP RST to the target.  If the proxy observes a connection error from the target, it SHOULD send a TLS "internal_error" alert to the client, or set the TCP RST bit if TLS is not in use.
 
@@ -119,6 +119,10 @@ HEADERS
 ...
 ~~~
 {: title="Templated TCP proxy example in HTTP/2"}
+
+## Use of 100 (Continue)
+
+This protocol is compatible with the use of an "Expect: 100-continue" request header ({{?RFC9110, Section 10.1.1}}) in any HTTP version.  The "100 Continue" response confirms receipt of a request at the proxy without waiting for the proxy-destination TCP handshake to succeed or fail.  This may be particularly helpful when the destination host is not responding, as TCP handshakes can hang for several minutes before failing.
 
 # Applicability
 
