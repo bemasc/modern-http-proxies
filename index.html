@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>bemasc/modern-http-proxies main preview</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <style type="text/css">/*<![CDATA[*/
+      body { font-family: "Helvetica Neue","Open Sans", Helvetica, Calibri,sans-serif; }
+      h1, h2, td { font-family: "Helvetica Neue", "Roboto Condensed", "Open Sans", Helvetica, Calibri, sans-serif; }
+      h1 { font-size: 20px; } h2 { font-size: 16px; }
+      table { margin: 5px 10px; border-collapse: collapse; }
+      th, td { font-weight: normal; text-align: left; padding: 2px 5px; }
+      a:link { color: #000; } a:visited { color: #00a; }
+    /*]]>*/</style>
+  </head>
+  <body>
+    <h1>Editor's drafts for main branch of <a href="https://github.com/bemasc/modern-http-proxies">bemasc/modern-http-proxies</a></h1>
+    <p>View <a href="issues.html">saved issues</a>, or the latest GitHub <a href="https://github.com/bemasc/modern-http-proxies/issues">issues</a> and <a href="https://github.com/bemasc/modern-http-proxies/pulls">pull requests</a> in the <a href="https://github.com/bemasc/modern-http-proxies">repo</a>.</p>
+    <table id="branch-main">
+      <tr>
+        <td><a href="./draft-schwartz-modern-http-proxies.html" class="html draft-schwartz-modern-http-proxies" title="Modernizing HTTP Forward Proxy Functionality (HTML)">Modern HTTP Proxies</a></td>
+        <td><a href="./draft-schwartz-modern-http-proxies.txt" class="txt draft-schwartz-modern-http-proxies" title="Modernizing HTTP Forward Proxy Functionality (Text)">plain text</a></td>
+        <td><a href="https://datatracker.ietf.org/doc/draft-schwartz-modern-http-proxies" class="dt draft-schwartz-modern-http-proxies" title="Datatracker for draft-schwartz-modern-http-proxies">datatracker</a></td>
+        <td><a href="https://www.ietf.org/rfcdiff?url1=draft-schwartz-modern-http-proxies&amp;url2=https://bemasc.github.io/modern-http-proxies/draft-schwartz-modern-http-proxies.txt" class="diff draft-schwartz-modern-http-proxies">diff with last submission</a></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a href="./draft-schwartz-httpbis-connect-tcp.html" class="html draft-schwartz-httpbis-connect-tcp" title="Template-Driven HTTP CONNECT Proxying for TCP (HTML)">Templated CONNECT-TCP</a></td>
+        <td><a href="./draft-schwartz-httpbis-connect-tcp.txt" class="txt draft-schwartz-httpbis-connect-tcp" title="Template-Driven HTTP CONNECT Proxying for TCP (Text)">plain text</a></td>
+        <td><a href="https://datatracker.ietf.org/doc/draft-schwartz-httpbis-connect-tcp" class="dt draft-schwartz-httpbis-connect-tcp" title="Datatracker for draft-schwartz-httpbis-connect-tcp">datatracker</a></td>
+        <td><a href="https://www.ietf.org/rfcdiff?url1=draft-schwartz-httpbis-connect-tcp&amp;url2=https://bemasc.github.io/modern-http-proxies/draft-schwartz-httpbis-connect-tcp.txt" class="diff draft-schwartz-httpbis-connect-tcp">diff with last submission</a></td>
+        <td></td>
+      </tr>
+    </table>
+    <h2>Preview for branch <a href="draft-schwartz-httpbis-connect-tcp-00">draft-schwartz-httpbis-connect-tcp-00</a></h2>
+    <table id="branch-draft-schwartz-httpbis-connect-tcp-00">
+      <tr>
+        <td><a href="draft-schwartz-httpbis-connect-tcp-00/draft-schwartz-modern-http-proxies.html" class="html draft-schwartz-modern-http-proxies" title="Modernizing HTTP Forward Proxy Functionality (HTML)">Modern HTTP Proxies</a></td>
+        <td><a href="draft-schwartz-httpbis-connect-tcp-00/draft-schwartz-modern-http-proxies.txt" class="txt draft-schwartz-modern-http-proxies" title="Modernizing HTTP Forward Proxy Functionality (Text)">plain text</a></td>
+        <td>same as main</td>
+      </tr>
+      <tr>
+        <td><a href="draft-schwartz-httpbis-connect-tcp-00/draft-schwartz-httpbis-connect-tcp.html" class="html draft-schwartz-httpbis-connect-tcp" title="Template-Driven HTTP CONNECT Proxying for TCP (HTML)">Templated CONNECT-TCP</a></td>
+        <td><a href="draft-schwartz-httpbis-connect-tcp-00/draft-schwartz-httpbis-connect-tcp.txt" class="txt draft-schwartz-httpbis-connect-tcp" title="Template-Driven HTTP CONNECT Proxying for TCP (Text)">plain text</a></td>
+        <td><a href="https://www.ietf.org/rfcdiff?url1=https://bemasc.github.io/modern-http-proxies/draft-schwartz-httpbis-connect-tcp.txt&amp;url2=https://bemasc.github.io/modern-http-proxies/draft-schwartz-httpbis-connect-tcp-00/draft-schwartz-httpbis-connect-tcp.txt" class="diff draft-schwartz-httpbis-connect-tcp">diff with main</a></td>
+      </tr>
+    </table>
+    <script>
+window.onload = function() {
+  var referrer_branch = 'main';
+  // e.g., "https://github.com/user/repo/tree/main"
+  var chunks = document.referrer.split("/");
+  if (chunks[2] === 'github.com' && chunks[5] === 'tree') {
+    referrer_branch = chunks[6];
+  }
+  let branch = document.querySelector('#branch-' + referrer_branch);
+  let h = document.location.hash.substring(1);
+  if (h === 'show') {
+    document.location.hash = '#' + branch.id;
+  } else if (branch && h.startsWith('go')) {
+    let e = branch.querySelector(h.substring(2));
+    if (e && e.href) {
+      document.location = e.href;
+    }
+  }
+};
+    </script>
+  </body>
+</html>
