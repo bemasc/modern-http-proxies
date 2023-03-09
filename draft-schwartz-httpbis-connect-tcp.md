@@ -18,7 +18,7 @@ author:
  -
     name: Benjamin M. Schwartz
     organization: Google LLC
-    email: bemasc@google.com
+    email: ietf@bemasc.net
 
 normative:
 
@@ -82,7 +82,7 @@ If the request is well-formed and permissible, the proxy MUST attempt the TCP co
 
 If the request is malformed or impermissible, the proxy MUST return a 4XX error code.  If a TCP connection was not established, the proxy MUST NOT switch protocols to "connect-tcp".
 
-From this point on, the connection SHALL confirm to all the usual requirements for classic CONNECT proxies in HTTP/1.1 ({{!RFC9110, Section 9.3.6}}).  Additionally, if the proxy observes a connection error from the client (e.g., a TCP RST, TCP timeout, or TLS error), it SHOULD send a TCP RST to the target.  If the proxy observes a connection error from the target, it SHOULD send a TLS "internal_error" alert to the client, or set the TCP RST bit if TLS is not in use.
+From this point on, the connection SHALL conform to all the usual requirements for classic CONNECT proxies in HTTP/1.1 ({{!RFC9110, Section 9.3.6}}).  Additionally, if the proxy observes a connection error from the client (e.g., a TCP RST, TCP timeout, or TLS error), it SHOULD send a TCP RST to the target.  If the proxy observes a connection error from the target, it SHOULD send a TLS "internal_error" alert to the client, or set the TCP RST bit if TLS is not in use.
 
 ~~~
 Client                                                 Proxy
@@ -91,6 +91,8 @@ GET /proxy?target_host=192.0.2.1&tcp_port=443 HTTP/1.1
 Host: example.com
 Connection: Upgrade
 Upgrade: connect-tcp
+
+** Proxy establishes a TCP connection to 192.0.2.1:443 **
 
                             HTTP/1.1 101 Switching Protocols
                             Connection: Upgrade
@@ -130,7 +132,7 @@ This protocol is compatible with the use of an "Expect: 100-continue" request he
 
 For server operators, template-driven TCP proxies are particularly valuable in situations where virtual-hosting is needed, or where multiple proxies must share an origin.  For example, the proxy might benefit from sharing an HTTP gateway that provides DDoS defense, performs request sanitization, or enforces user authorization.
 
-Template-driven proxies can also be placed on high-entropy Capability URLs {{CAPABILITY}}, so that only authorized users can discover the proxy service.
+The URI template can also be structured to generate high-entropy Capability URLs {{CAPABILITY}}, so that only authorized users can discover the proxy service.
 
 ## Clients
 
@@ -158,7 +160,7 @@ Templated TCP proxies can make use of standard HTTP gateways and path-routing to
 
 * support Extended CONNECT.
 * convert HTTP/1.1 Upgrade requests into Extended CONNECT.
-* allow the CONNECT method to pass through to the origin.
+* allow the Extended CONNECT method to pass through to the origin.
 * forward Proxy-* request headers to the origin.
 
 # IANA Considerations
@@ -174,4 +176,4 @@ IF APPROVED, IANA is requested to add the following entry to the HTTP Upgrade To
 # Acknowledgments
 {:numbered="false"}
 
-TODO acknowledge.
+Thanks to Amos Jeffries for close review.
