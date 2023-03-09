@@ -9,26 +9,26 @@
 <meta content="
        HTTP proxying features have long been part of the core HTTP specification.  However, the core proxying functionality has several important deficiencies in modern HTTP environments.  This specification defines alternative proxy service configurations for HTTP requests and TCP connections.  These services are identified by URI Templates and designed for parallelism with DoH, MASQUE, and Oblivious HTTP. 
     " name="description">
-<meta content="xml2rfc 3.15.2" name="generator">
+<meta content="xml2rfc 3.16.0" name="generator">
 <meta content="Internet-Draft" name="keyword">
 <meta content="draft-schwartz-modern-http-proxies-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.15.2
-    Python 3.10.5
+  xml2rfc 3.16.0
+    Python 3.10.10
     appdirs 1.4.4
     ConfigArgParse 1.5.3
     google-i18n-address 2.5.2
     html5lib 1.1
     intervaltree 3.1.0
     Jinja2 3.1.2
-    lxml 4.9.1
+    lxml 4.9.2
     MarkupSafe 2.1.1
     pycountry 22.3.5
     PyYAML 6.0
-    requests 2.27.1
-    setuptools 59.4.0
+    requests 2.28.1
+    setuptools 65.6.0
     six 1.16.0
-    wcwidth 0.2.5
+    wcwidth 0.2.6
 -->
 <link href="draft-schwartz-modern-http-proxies.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -359,7 +359,7 @@ ul.empty li, .ulEmpty li {
   margin-top: 0.5em;
 }
 :is(ul, ol).compact, .ulCompact, .olCompact {
-  line-height: 100%;
+  line-height: 1;
   margin: 0 0 0 2em;
 }
 
@@ -369,10 +369,13 @@ dl {
   --indent: 3ch;
   /* --indent: attr(indent ch); not supported in any browser, but we can dream */
 }
+dl.olPercent {
+  --indent: 5ch;
+}
 dl > dt {
   float: left;
-  margin-right: 1em;
-  min-width: 12ch;
+  margin-right: 2ch;
+  min-width: 8ch;
 }
 dl.dlNewline > dt {
   float: none;
@@ -381,6 +384,9 @@ dl > dd {
   margin-bottom: .8em;
   margin-left: var(--indent) !important; /* stupid element overrides */
   min-height: 2ex;
+}
+dl.olPercent > dt {
+  min-width: calc(var(--indent) - 2ch);
 }
 :is(dl.compact, .dlCompact) > dd {
   margin-bottom: 0;
@@ -395,7 +401,7 @@ dl > dd > dl {
   margin-top: 0.5em;
   margin-bottom: 0;
 }
-dl .break {
+:is(dd, span).break {
   display: none;
 }
 
@@ -403,11 +409,11 @@ dl .break {
 a, a[href].selfRef:hover {
   text-decoration: none;
 }
-a[href].selfRef {
-  color: var(--text-color);
-}
 a[href] {
   color: var(--link-color);
+}
+a[href].selfRef, .iref + a[href].internal {
+  color: var(--text-color);
 }
 a[href]:hover {
   text-decoration: underline;
@@ -415,7 +421,7 @@ a[href]:hover {
 a[href].selfRef:hover {
   background-color: var(--highlight-color);
 }
-a.xref {
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
   white-space: nowrap;
 }
 
@@ -427,7 +433,9 @@ tt, code, pre {
 tt, code {
   /* changing the font for inline elements leads to different ascender
      and descender heights; as we want to retain baseline alignment,
-     remove leading to avoid altering the final height of lines */
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
   line-height: 0;
 }
 :is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
@@ -579,10 +587,14 @@ hr {
 .bcp14 {
   font-variant: small-caps;
   font-weight: 600;
-  font-size: 14.5px;
+  font-size: var(--small-font-size);
 }
 .role {
   font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
 }
 
 /* info block */
@@ -1024,7 +1036,7 @@ svg :is([stroke="white"], [stroke^="#fff"]) {
 svg :is([fill="black"], [fill^="#000"], :not([fill])) {
   fill: var(--text-color);
 }
-svg :is([stroke="fill"], [fill^="#fff"]) {
+svg :is([fill="white"], [fill^="#fff"]) {
   fill: var(--background-color);
 }
 </style>
@@ -1035,11 +1047,11 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Modern HTTP Proxies</td>
-<td class="right">November 2022</td>
+<td class="right">March 2023</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Schwartz</td>
-<td class="center">Expires 18 May 2023</td>
+<td class="center">Expires 10 September 2023</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1052,12 +1064,12 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-schwartz-modern-http-proxies-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-11-14" class="published">14 November 2022</time>
+<time datetime="2023-03-09" class="published">9 March 2023</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2023-05-18">18 May 2023</time></dd>
+<dd class="expires"><time datetime="2023-09-10">10 September 2023</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1091,7 +1103,7 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 18 May 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 10 September 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1100,7 +1112,7 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
         </h2>
 <p id="section-boilerplate.2-1">
-            Copyright (c) 2022 IETF Trust and the persons identified as the
+            Copyright (c) 2023 IETF Trust and the persons identified as the
             document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.2-2">
             This document is subject to BCP 78 and the IETF Trust's Legal
@@ -1338,8 +1350,8 @@ Proxy-Authorization: ...
           </h4>
 <p id="section-4.1.1-1">Consider a proxy identified as "https://example.com/proxy{?target_host,tcp_port}".  To establish a TCP connection to 192.0.2.1:443, the following exchange would occur:<a href="#section-4.1.1-1" class="pilcrow">¶</a></p>
 <span id="name-modern-tcp-transport-proxy-"></span><figure id="figure-1">
-            <div id="section-4.1.1-2.1">
-<pre class="lang-http-message sourcecode">
+            <div class="lang-http-message sourcecode" id="section-4.1.1-2.1">
+<pre>
 Client                                                 Proxy
 
 GET /proxy?target_host=192.0.2.1&amp;tcp_port=443 HTTP/1.1
@@ -1414,8 +1426,8 @@ https://proxy.example/{?target_uri,target_host,tcp_port,port,target,ipproto,dns}
         </h3>
 <p id="section-5.2-1">A modern HTTP request proxy can be used as an Oblivious HTTP Relay.  For example, suppose the relay is identified as "https://proxy.example.org/relay{?target_uri}", and the Oblivious HTTP Gateway is "https://example.com/gateway".  The client would send requests to the proxy as follows:<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 <span id="name-use-of-an-http-request-prox"></span><figure id="figure-3">
-          <div id="section-5.2-2.1">
-<pre class="lang-http-message sourcecode">
+          <div class="lang-http-message sourcecode" id="section-5.2-2.1">
+<pre>
 POST /relay?target_uri=https%3A%2F%2Fexample.com%2Fgateway HTTP/1.1
 Host: proxy.example.org
 Proxy-Authorization: ...
@@ -1428,8 +1440,8 @@ Content-Type: message/ohttp-req
           </figcaption></figure>
 <p id="section-5.2-3">If a modern HTTP request proxy supports HTTP/2 and Extended CONNECT, it is even possible to reach a modern TCP transport proxy through it:<a href="#section-5.2-3" class="pilcrow">¶</a></p>
 <span id="name-use-of-a-tcp-transport-prox"></span><figure id="figure-4">
-          <div id="section-5.2-4.1">
-<pre class="lang-http-message sourcecode">
+          <div class="lang-http-message sourcecode" id="section-5.2-4.1">
+<pre>
 CONNECT HTTP/2.0
 :authority = request-proxy.example
 :scheme = https
@@ -1444,8 +1456,8 @@ CONNECT HTTP/2.0
           </figcaption></figure>
 <p id="section-5.2-5">Modern TCP transport proxies support requests that offer multiple IP addresses:<a href="#section-5.2-5" class="pilcrow">¶</a></p>
 <span id="name-tcp-transport-proxy-request"></span><figure id="figure-5">
-          <div id="section-5.2-6.1">
-<pre class="lang-http-message sourcecode">
+          <div class="lang-http-message sourcecode" id="section-5.2-6.1">
+<pre>
 CONNECT HTTP/2.0
 :authority = request-proxy.example
 :scheme = https
@@ -1533,7 +1545,7 @@ CONNECT HTTP/2.0
 <dl class="references">
 <dt id="I-D.ietf-masque-connect-ip">[I-D.ietf-masque-connect-ip]</dt>
         <dd>
-<span class="refAuthor">Pauly, T.</span>, <span class="refAuthor">Schinazi, D.</span>, <span class="refAuthor">Chernyakhovsky, A.</span>, <span class="refAuthor">Kühlewind, M.</span>, and <span class="refAuthor">M. Westerlund</span>, <span class="refTitle">"IP Proxying Support for HTTP"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-masque-connect-ip-03</span>, <time datetime="2022-09-27" class="refDate">27 September 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-masque-connect-ip-03">https://datatracker.ietf.org/doc/html/draft-ietf-masque-connect-ip-03</a>&gt;</span>. </dd>
+<span class="refAuthor">Pauly, T.</span>, <span class="refAuthor">Schinazi, D.</span>, <span class="refAuthor">Chernyakhovsky, A.</span>, <span class="refAuthor">Kühlewind, M.</span>, and <span class="refAuthor">M. Westerlund</span>, <span class="refTitle">"Proxying IP in HTTP"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-masque-connect-ip-08</span>, <time datetime="2023-03-01" class="refDate">1 March 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-masque-connect-ip-08">https://datatracker.ietf.org/doc/html/draft-ietf-masque-connect-ip-08</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC1945">[RFC1945]</dt>
         <dd>

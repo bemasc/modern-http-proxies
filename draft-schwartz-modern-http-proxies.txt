@@ -4,8 +4,8 @@
 
 httpbis                                                   B. M. Schwartz
 Internet-Draft                                                Google LLC
-Intended status: Standards Track                        14 November 2022
-Expires: 18 May 2023
+Intended status: Standards Track                            9 March 2023
+Expires: 10 September 2023
 
 
               Modernizing HTTP Forward Proxy Functionality
@@ -36,11 +36,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 May 2023.
+   This Internet-Draft will expire on 10 September 2023.
 
 Copyright Notice
 
-   Copyright (c) 2022 IETF Trust and the persons identified as the
+   Copyright (c) 2023 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -405,11 +405,10 @@ https://proxy.example/{?target_uri,target_host,tcp_port,port,target,ipproto,dns}
 
    [I-D.ietf-masque-connect-ip]
               Pauly, T., Schinazi, D., Chernyakhovsky, A., Kühlewind,
-              M., and M. Westerlund, "IP Proxying Support for HTTP",
-              Work in Progress, Internet-Draft, draft-ietf-masque-
-              connect-ip-03, 27 September 2022,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-masque-
-              connect-ip-03>.
+              M., and M. Westerlund, "Proxying IP in HTTP", Work in
+              Progress, Internet-Draft, draft-ietf-masque-connect-ip-08,
+              1 March 2023, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-masque-connect-ip-08>.
 
    [RFC1945]  Berners-Lee, T., Fielding, R., and H. Frystyk, "Hypertext
               Transfer Protocol -- HTTP/1.0", RFC 1945,

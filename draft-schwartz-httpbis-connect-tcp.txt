@@ -4,8 +4,8 @@
 
 httpbis                                                   B. M. Schwartz
 Internet-Draft                                                Google LLC
-Intended status: Standards Track                        14 November 2022
-Expires: 18 May 2023
+Intended status: Standards Track                            9 March 2023
+Expires: 10 September 2023
 
 
              Template-Driven HTTP CONNECT Proxying for TCP
@@ -35,11 +35,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 May 2023.
+   This Internet-Draft will expire on 10 September 2023.
 
 Copyright Notice
 
-   Copyright (c) 2022 IETF Trust and the persons identified as the
+   Copyright (c) 2023 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -188,7 +188,7 @@ Table of Contents
    4XX error code.  If a TCP connection was not established, the proxy
    MUST NOT switch protocols to "connect-tcp".
 
-   From this point on, the connection SHALL confirm to all the usual
+   From this point on, the connection SHALL conform to all the usual
    requirements for classic CONNECT proxies in HTTP/1.1 ([RFC9110],
    Section 9.3.6).  Additionally, if the proxy observes a connection
    error from the client (e.g., a TCP RST, TCP timeout, or TLS error),
@@ -203,6 +203,8 @@ Table of Contents
    Host: example.com
    Connection: Upgrade
    Upgrade: connect-tcp
+
+   ** Proxy establishes a TCP connection to 192.0.2.1:443 **
 
                                HTTP/1.1 101 Switching Protocols
                                Connection: Upgrade
@@ -260,9 +262,9 @@ Table of Contents
    benefit from sharing an HTTP gateway that provides DDoS defense,
    performs request sanitization, or enforces user authorization.
 
-   Template-driven proxies can also be placed on high-entropy Capability
-   URLs [CAPABILITY], so that only authorized users can discover the
-   proxy service.
+   The URI template can also be structured to generate high-entropy
+   Capability URLs [CAPABILITY], so that only authorized users can
+   discover the proxy service.
 
 4.2.  Clients
 
@@ -304,7 +306,7 @@ Table of Contents
 
    *  convert HTTP/1.1 Upgrade requests into Extended CONNECT.
 
-   *  allow the CONNECT method to pass through to the origin.
+   *  allow the Extended CONNECT method to pass through to the origin.
 
    *  forward Proxy-* request headers to the origin.
 
@@ -357,11 +359,10 @@ Table of Contents
 
    [I-D.ietf-masque-connect-ip]
               Pauly, T., Schinazi, D., Chernyakhovsky, A., Kühlewind,
-              M., and M. Westerlund, "IP Proxying Support for HTTP",
-              Work in Progress, Internet-Draft, draft-ietf-masque-
-              connect-ip-03, 27 September 2022,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-masque-
-              connect-ip-03>.
+              M., and M. Westerlund, "Proxying IP in HTTP", Work in
+              Progress, Internet-Draft, draft-ietf-masque-connect-ip-08,
+              1 March 2023, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-masque-connect-ip-08>.
 
    [RFC9112]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
               Ed., "HTTP/1.1", STD 99, RFC 9112, DOI 10.17487/RFC9112,
@@ -377,7 +378,7 @@ Table of Contents
 
 Acknowledgments
 
-   TODO acknowledge.
+   Thanks to Amos Jeffries for close review.
 
 Author's Address
 
