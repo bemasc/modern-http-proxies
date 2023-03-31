@@ -254,7 +254,7 @@ Table of Contents
 4.1.  Latency optimizations
 
    When using this specification in HTTP/2 or HTTP/3, clients MAY start
-   sending TCP stream content without waiting for an HTTP response code.
+   sending TCP stream content without waiting for an HTTP response.
    Proxies MUST buffer this "false start" content until the TCP stream
    becomes writable, and discard it if the TCP connection fails.  (This
    "false start" behavior is not permitted in HTTP/1.1 because it would
@@ -274,7 +274,7 @@ Table of Contents
 
    This specification supports the "Expect: 100-continue" request header
    ([RFC9110], Section 10.1.1) in any HTTP version.  The "100
-   (Continue)" response confirms receipt of a request at the proxy
+   (Continue)" status code confirms receipt of a request at the proxy
    without waiting for the proxy-destination TCP handshake to succeed or
    fail.  This might be particularly helpful when the destination host
    is not responding, as TCP handshakes can hang for several minutes
@@ -283,7 +283,7 @@ Table of Contents
 
    Proxies implementing this specification SHOULD include a Proxy-Status
    response header [RFC9209] in any success or failure response (i.e.,
-   response codes 101, 2XX, 4XX, or 5XX) to support advanced client
+   status codes 101, 2XX, 4XX, or 5XX) to support advanced client
    behaviors and diagnostics.  In HTTP/2 or HTTP/3, proxies MAY
    additionally send a Proxy-Status trailer in the event of an unclean
    shutdown.
