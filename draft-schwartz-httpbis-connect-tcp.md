@@ -80,9 +80,9 @@ If the request is well-formed and permissible, the proxy MUST attempt the TCP co
 * The response SHALL include a Connection header field with the value "Upgrade".
 * The response SHALL include a single Upgrade header field with the value "connect-tcp".
 
-If the request is malformed or impermissible, the proxy MUST return a 4XX error code.  If a TCP connection was not established, the proxy MUST NOT switch protocols to "connect-tcp".
+If the request is malformed or impermissible, the proxy MUST return a 4XX error code.  If a TCP connection was not established, the proxy MUST NOT switch protocols to "connect-tcp", and the client MAY reuse this connection for additional HTTP requests.
 
-From this point on, the connection SHALL conform to all the usual requirements for classic CONNECT proxies in HTTP/1.1 ({{!RFC9110, Section 9.3.6}}).  Additionally, if the proxy observes a connection error from the client (e.g., a TCP RST, TCP timeout, or TLS error), it SHOULD send a TCP RST to the target.  If the proxy observes a connection error from the target, it SHOULD send a TLS "internal_error" alert to the client, or set the TCP RST bit if TLS is not in use.
+After a success response is returned, the connection SHALL conform to all the usual requirements for classic CONNECT proxies in HTTP/1.1 ({{!RFC9110, Section 9.3.6}}).  Additionally, if the proxy observes a connection error from the client (e.g., a TCP RST, TCP timeout, or TLS error), it SHOULD send a TCP RST to the target.  If the proxy observes a connection error from the target, it SHOULD send a TLS "internal_error" alert to the client, or set the TCP RST bit if TLS is not in use.
 
 ~~~
 Client                                                 Proxy
@@ -122,9 +122,21 @@ HEADERS
 ~~~
 {: title="Templated TCP proxy example in HTTP/2"}
 
-## Use of 100 (Continue)
+# Additional Connection Setup Behaviors
 
-This protocol is compatible with the use of an "Expect: 100-continue" request header ({{?RFC9110, Section 10.1.1}}) in any HTTP version.  The "100 Continue" response confirms receipt of a request at the proxy without waiting for the proxy-destination TCP handshake to succeed or fail.  This may be particularly helpful when the destination host is not responding, as TCP handshakes can hang for several minutes before failing.
+This section discusses some behaviors that are permitted or recommended in order to enhance the performance or functionality of connection setup.
+
+## Latency optimizations
+
+When using this specification in HTTP/2 or HTTP/3, clients MAY start sending TCP stream content without waiting for an HTTP response.  Proxies MUST buffer this "false start" content until the TCP stream becomes writable, and discard it if the TCP connection fails.  (This "false start" behavior is not permitted in HTTP/1.1 because it would prevent reuse of the connection after an error response such as 407 (Proxy Authentication Required).)
+
+Servers that host a proxy under this specification MAY offer support for TLS early data in accordance with {{!RFC8470}}.  Clients MAY send "connect-tcp" requests in early data, and MAY include "false start" content in early data (in HTTP/2 and HTTP/3).  Proxies MAY accept, reject, or delay processing of this early data.  For example, a proxy with limited anti-replay defenses might choose to perform DNS resolution of the `target_host` when a request arrives in early data, but delay the TCP connection until the TLS handshake completes.
+
+## Conveying metadata
+
+This specification supports the "Expect: 100-continue" request header ({{?RFC9110, Section 10.1.1}}) in any HTTP version.  The "100 (Continue)" status code confirms receipt of a request at the proxy without waiting for the proxy-destination TCP handshake to succeed or fail.  This might be particularly helpful when the destination host is not responding, as TCP handshakes can hang for several minutes before failing.  Implementation of "100 (Continue)" support is OPTIONAL for clients and REQUIRED for proxies.
+
+Proxies implementing this specification SHOULD include a Proxy-Status response header {{!RFC9209}} in any success or failure response (i.e., status codes 101, 2XX, 4XX, or 5XX) to support advanced client behaviors and diagnostics.  In HTTP/2 or HTTP/3, proxies MAY additionally send a Proxy-Status trailer in the event of an unclean shutdown.
 
 # Applicability
 
@@ -176,4 +188,4 @@ IF APPROVED, IANA is requested to add the following entry to the HTTP Upgrade To
 # Acknowledgments
 {:numbered="false"}
 
-Thanks to Amos Jeffries for close review.
+Thanks to Amos Jeffries and Tommy Pauly for close review and suggested changes.
