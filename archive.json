@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-03-30T01:01:44.513462+00:00",
+  "timestamp": "2023-04-02T01:01:15.895089+00:00",
   "repo": "bemasc/modern-http-proxies",
   "labels": [
     {
@@ -49,6 +49,74 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
-  "pulls": []
+  "issues": [
+    {
+      "number": 1,
+      "id": "I_kwDOIOCA2M5iQ3T7",
+      "title": "Mention sending data before a response",
+      "url": "https://github.com/bemasc/modern-http-proxies/issues/1",
+      "state": "OPEN",
+      "author": "tfpauly",
+      "authorAssociation": "NONE",
+      "assignees": [
+        "bemasc"
+      ],
+      "labels": [],
+      "body": "Like CONNECT-UDP, we should explicitly mention that the client is allowed to send data prior to receiving the response, so we can send info like the TLS client hello.\r\n\r\nCurrently CONNECT proxying leaves this ambiguous, and support amongst servers is inconsistent.",
+      "createdAt": "2023-03-31T02:56:26Z",
+      "updatedAt": "2023-03-31T17:16:05Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "bemasc",
+          "authorAssociation": "OWNER",
+          "body": "OK, please review a proposed fix: #2.\r\n\r\nIn the course of writing this up, I realized that HTTP/1.1 and HTTP/2 are actually very different here.  The current proposed text only allows this in HTTP/2 and HTTP/3.\r\n\r\nI also threw in some other setup-related improvements just for fun.",
+          "createdAt": "2023-03-31T17:15:54Z",
+          "updatedAt": "2023-03-31T17:16:05Z"
+        }
+      ]
+    }
+  ],
+  "pulls": [
+    {
+      "number": 2,
+      "id": "PR_kwDOIOCA2M5NXz1o",
+      "title": "Discuss false start, early data, and Proxy-Status",
+      "url": "https://github.com/bemasc/modern-http-proxies/pull/2",
+      "state": "OPEN",
+      "author": "bemasc",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #1",
+      "createdAt": "2023-03-31T17:13:31Z",
+      "updatedAt": "2023-04-01T02:07:39Z",
+      "baseRepository": "bemasc/modern-http-proxies",
+      "baseRefName": "main",
+      "baseRefOid": "2a4145243e4289d6883894c2bce6387cb9349e0d",
+      "headRepository": "bemasc/modern-http-proxies",
+      "headRefName": "bemasc-false-start",
+      "headRefOid": "9161c7e8adbd5e2f97bb6a2c9f546914eb549430",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOIOCA2M5RhuKj",
+          "commit": {
+            "abbreviatedOid": "9161c7e"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2023-04-01T02:07:39Z",
+          "updatedAt": "2023-04-01T02:07:39Z",
+          "comments": []
+        }
+      ]
+    }
+  ]
 }
