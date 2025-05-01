@@ -1,6 +1,6 @@
 ---
-title: "Modernizing HTTP Forward Proxy Functionality"
-abbrev: "Modern HTTP Proxies"
+title: "Template-Driven HTTP Request Proxying"
+abbrev: "Templated HTTP Request Proxies"
 category: std
 
 docname: draft-schwartz-modern-http-proxies-latest
@@ -17,8 +17,8 @@ pi: [toc, sortrefs, symrefs]
 author:
  -
     name: Benjamin M. Schwartz
-    organization: Google LLC
-    email: bemasc@google.com
+    organization: Meta Platforms, Inc.
+    email: ietf@bemasc.net
 
 normative:
 
@@ -27,7 +27,7 @@ informative:
 
 --- abstract
 
-HTTP proxying features have long been part of the core HTTP specification.  However, the core proxying functionality has several important deficiencies in modern HTTP environments.  This specification defines alternative proxy service configurations for HTTP requests and TCP connections.  These services are identified by URI Templates and designed for parallelism with DoH, MASQUE, and Oblivious HTTP.
+HTTP request proxying behaviors have long been part of the core HTTP specification.  However, the core request proxying functionality has several important deficiencies in modern HTTP environments.  This specification defines an alternative proxy service configuration for HTTP requests.  The proxy service is identified by a URI Template, similarly to "connect-tcp" and "connect-udp".
 
 --- middle
 
@@ -35,37 +35,64 @@ HTTP proxying features have long been part of the core HTTP specification.  Howe
 
 ## History
 
-An HTTP forward proxy (or just "proxy" in the HTTP standards) is an HTTP service that acts on behalf of the client as an intermediary for some or all HTTP requests.  HTTP/1.0 defines the initial HTTP proxying mechanism: the client formats its request target in "absolute form" (i.e. with a full URI in the Request-Line) and delivers it to the proxy, which reissues it to the origin specified in the URI ({{?RFC1945, Section 5.1.2}}).  In this specification, we call this behavior an "HTTP request proxy".
+An HTTP forward proxy (or just "proxy" in the HTTP standards) is an HTTP service that acts on behalf of the client as an intermediary for some or all HTTP requests.  HTTP/1.0 defined the initial HTTP proxying mechanism: the client formats its request target in "absolute form" (i.e., with a full URI in the Request-Line) and delivers it to the proxy, which reissues the request to the origin specified in the URI ({{?RFC1945, Section 5.1.2}}).  In this specification, we call this behavior a "classic HTTP request proxy".
 
-With the introduction of "https" URIs, a new proxying mechanism was needed to enable TLS connections to traverse the proxy.  To enable this, HTTP/1.1 introduced the CONNECT method.  In this method, the request target specifies a host and port number, and the proxy forwards TCP payloads between the client and this destination ({{?RFC9110, Section 9.3.6}}).  In this specification, we call this behavior a "TCP transport proxy".
-
-These two methods sufficed until the introduction of HTTP/3, which uses a UDP transport.  The MASQUE effort has filled the gap by defining proxy mechanisms that are capable of proxying UDP datagrams {{?RFC9298}}, and more generally IP datagrams {{?I-D.ietf-masque-connect-ip}}.  The destination host and port number (if applicable) are encoded into the HTTP resource path, and end-to-end datagrams are wrapped into HTTP Datagrams {{?RFC9297}} on the client-proxy path.
+In HTTP/1.1, proxy requests are additionally required to carry a Host header whose value matches the authority in the Request URI (not the name of the proxy server).  In HTTP/2 and HTTP/3, the destination host is specified in the :authority pseudo-header field ({{?RFC9113, Section 8.3.1}}).
 
 ## Problems
 
-Classic HTTP request proxies and TCP transport proxies are identified by an origin, not a URI.  The proxy service does not have a path of its own.  This prevents any origin from hosting multiple distinct proxy services and makes it difficult to manage a proxy service in a fashion similar to other HTTP services.
+HTTP clients can be configured to use proxies by selecting a proxy host, a port, and whether to use a security protocol. However, requests to the proxy do not carry this configuration information. Instead, they only indicate the URI of the requested resource. This prevents any HTTP server from hosting multiple distinct proxy services, as the server cannot distinguish them by path (as with distinct resources) or by origin (as in "virtual hosting").
 
-In some circumstances, it may be possible to work around this limitation by hosting many origins on a single server (virtual-hosting).  In HTTP/1.1, the "Host" header was introduced to support such virtual-hosting by distinguishing the hostname of the proxy (in the Host header) from the hostname of the destination (in the absolute-form request URI).  However, in HTTP/2 and HTTP/3, this distinction no longer exists.  As a result, classic HTTP request proxies are not compatible with virtual-hosting in HTTP/2 or HTTP/3.
+The absence of an explicit origin for the proxy also rules out the usual defenses against server port misdirection attacks (see {{Section 7.4 of ?RFC9110}}).
 
-Classic TCP transport proxies can be used with a host that is specified as a domain name or an IP address.  However, because only a single IP address can be specified, Happy Eyeballs and cross-IP fallback can only be used when the host is a domain name.  For requests to succeed, the client must know which address families are supported by the proxy.
+<!--
+### Context Mixing
+
+Classic HTTP request proxies forward the entire request, including all its headers, with a few exceptions:
+
+* The Proxy-Authenticate, Proxy-Authorization, Proxy-Authentication-Info, and Proxy-Status headers are not forwarded.
+* In HTTP/1.1, the Host header, and connection-specific headers listed in Connection header, are not forwarded.
+* Proxies are required to add a Via header identifying the proxy.
+* For TRACE and OPTIONS methods, proxies are required to check and decrement the Max-Forwards header.
+
+In HTTP/2 and HTTP/3, this leaves no way to attach metadata to the request between the client and the proxy.
+-->
 
 ## Overview
 
-This specification describes alternative protocols for HTTP request proxies and TCP transport proxies in HTTP.  Like other modern HTTP access services such as DoH, CONNECT-UDP, and CONNECT-IP, the proxy is identified by a URI Template.  Proxy interactions reuse standard HTTP components and semantics, avoiding changes to the core HTTP protocol.
+This specification describes an alternative protocol for an HTTP request proxy.  Like CONNECT-TCP, CONNECT-UDP, and CONNECT-IP, the proxy is identified by a URI Template.
 
 # Conventions and Definitions
 
 {::boilerplate bcp14-tagged}
 
-# Modern HTTP Request Proxies
+# Requirements
 
-A modern HTTP request proxy is identified by a URI Template containing a variable named "target_uri".  To convert an HTTP request into a proxied request, the client MUST substitute the request's URI into this variable, expand the template, and use the result as the new request URI.
+## Use of Templates
 
-HTTP headers work the same as in classic HTTP request proxies.
+A templated HTTP request proxy is identified by a URI Template containing a variable named "target_uri".  To convert an HTTP request into a proxied request, the client MUST substitute the request's URI into this variable, expand the template, and use the result as the new request URI.
 
-A modern HTTP request proxy is also suitable for use as an Oblivious HTTP relay, if it provides the required privacy guarantees.
+HTTP headers and status codes are processed in the same way as in classic HTTP request proxies.
 
-### Example
+A templated HTTP request proxy is also suitable for use as an Oblivious HTTP relay, if it provides the required privacy guarantees.
+
+## Configuration
+
+Clients that support both classic HTTP request proxies and template-driven proxies MAY accept both types via a single configuration string.  If the configuration string can be parsed as a URI Template containing the "target_uri" variable, it is a template-driven request proxy.  Otherwise, it is presumed to represent a classic HTTP request proxy.
+
+This specification defines a new Proxy-Status parameter: "use_template" (see registration in {{iana-considerations}}), which conveys a preferred URI Template for the proxy.  Upon receipt of this parameter, the client SHOULD update its configuration to use the new template for the remainder of the session if possible, and retry the request using the new template if it also received a Proxy-Status "error" parameter.
+
+If the client is configured with a classic HTTP request proxy, and the template string is the special value "default", the client MUST use the following default proxy template:
+
+~~~
+https://$PROXY_HOST:$PROXY_PORT/.well-known/masque
+                 /http/{target_uri}
+~~~
+{: title="Registered default template"}
+
+This allows a virtual-hosted proxy server to learn the proxy's hostname, which is not present in the initial request.
+
+# Examples
 
 Consider a proxy identified as "https://example.com/proxy{?target_uri}".  Requests would then be transformed as follows:
 
@@ -92,81 +119,7 @@ Notes on this example:
 * The scheme, which is implicit in the original request, is explicit in the transformed request.  The scheme in this example is "https", indicating that the client is asking the proxy to establish a secure connection to the target.
 * The client can add Proxy-* headers to communicate with the proxy.
 
-# Modern TCP transport proxies
-
-A modern TCP transport proxy for HTTP is identified by a URI Template {{!RFC6570}} containing variables named "target_host" and "tcp_port".  The client substitutes the destination host and port number into these variables to produce the request URI.
-
-The "target_host" variable MUST be a domain name, an IP address literal, or a list of IP addresses.  The "tcp_port" variable MUST be a single integer.  If "target_host" is a list (as in {{Section 2.4.2 of !RFC6570}}), the server SHOULD perform the same connection procedure as if these addresses had been returned in response to A and AAAA queries for a domain name.
-
-## In HTTP/1.1
-
-In HTTP/1.1, the client uses the proxy by issuing a request as follows:
-
-* The method SHALL be "GET".
-* The request SHALL include a single Host header field containing the origin of the proxy.
-* The request SHALL include a Connection header field with the value "Upgrade".
-* The request SHALL include an "Upgrade" header field with the value "connect-tcp".
-* The request's target SHALL be the URI derived from expansion of the proxy's URI Template.
-
-If the request is well-formed and permissible, the proxy MUST attempt the TCP connection before returning its response header.  If the TCP connection is successful, the response SHALL be as follows:
-
-* The HTTP status code SHALL be 101 (Switching Protocols).
-* The response SHALL include a Connection header field with the value "Upgrade".
-* The response SHALL include a single Upgrade header field with the value "connect-tcp".
-
-If the request is malformed or impermissible, the proxy MUST return a 4XX error code.  If the TCP connection failed, the proxy MUST NOT return a 101 or 2XX status code.
-
-If the proxy observes an unclean shutdown from the client (e.g. a TCP RST or TLS error), it SHOULD send a TCP RST to the target.  If the proxy receives a TCP RST from the target, it SHOULD send a TLS "internal_error" alert to the client, or set the TCP RST bit if TLS is not in use.
-
-### Example
-
-Consider a proxy identified as "https://example.com/proxy{?target_host,tcp_port}".  To establish a TCP connection to 192.0.2.1:443, the following exchange would occur:
-
-~~~ http-message
-Client                                                 Proxy
-
-GET /proxy?target_host=192.0.2.1&tcp_port=443 HTTP/1.1
-Host: example.com
-Connection: Upgrade
-Upgrade: connect-tcp
-
-                            HTTP/1.1 101 Switching Protocols
-                            Connection: Upgrade
-                            Upgrade: connect-tcp
-~~~
-{: title="Modern TCP transport proxy in HTTP/1.1"}
-
-## In HTTP/2 and HTTP/3
-
-In HTTP/2 and HTTP/3, the client uses the proxy by issuing an "extended CONNECT" request as follows:
-
-* The :method pseudo-header field SHALL be "CONNECT".
-* The :protocol pseudo-header field SHALL be "connect-tcp".
-* The :authority pseudo-header field SHALL contain the authority of the proxy.
-* The :path and :scheme pseudo-header fields SHALL contain the path and scheme of the request URI derived from the proxy's URI Template.
-
-From this point on, the request and response streams SHALL conform to all the usual requirements for non-extended CONNECT in this HTTP version.
-
-# Additional Examples
-
-## Template expansion
-
-The names of the variables in the URI Template uniquely identify the capabilities of the proxy.  Undefined variables are permitted in URI Templates, so a single template can be used for multiple purposes:
-
-~~~
-Combined HTTP request and TCP transport proxy:
-https://example.com/proxy{?target_uri,target_host,tcp_port}
-
-Combined HTTP, TCP, UDP, and IP proxy with DoH server:
-https://proxy.example/{?target_uri,target_host,tcp_port,port,target,ipproto,dns}
-~~~
-{: title="Multipurpose templates"}
-
-Multipurpose templates can be useful when a single client may benefit from access to multiple complementary services (e.g. TCP and UDP), or when the proxy is used by a variety of clients with different needs.
-
-## Sample exchanges
-
-A modern HTTP request proxy can be used as an Oblivious HTTP Relay.  For example, suppose the relay is identified as "https://proxy.example.org/relay{?target_uri}", and the Oblivious HTTP Gateway is "https://example.com/gateway".  The client would send requests to the proxy as follows:
+A templated HTTP request proxy can be used as an Oblivious HTTP Relay.  For example, suppose the relay is identified as "https://proxy.example.org/relay{?target_uri}", and the Oblivious HTTP Gateway is "https://example.com/gateway".  The client would send requests to the proxy as follows:
 
 ~~~ http-message
 POST /relay?target_uri=https%3A%2F%2Fexample.com%2Fgateway HTTP/1.1
@@ -177,30 +130,63 @@ Content-Type: message/ohttp-req
 ~~~
 {: title="Use of an HTTP request proxy as an Oblivious relay"}
 
-If a modern HTTP request proxy supports HTTP/2 and Extended CONNECT, it is even possible to reach a modern TCP transport proxy through it:
+If a templated HTTP request proxy supports HTTP/2 and Extended CONNECT, it is even possible to reach a CONNECT-TCP transport proxy through it:
 
 ~~~ http-message
 CONNECT HTTP/2.0
 :authority = request-proxy.example
 :scheme = https
 :path = /proxy?target_uri=https%3A%2F%2Ftransport-proxy.example%2Fproxy
-    %3Ftarget_host%3Ddestination.example%26tcp_port%3D443
+    %3Ftarget_host%3Ddestination.example%26target_port%3D443
 :protocol = connect-tcp
+capsule-protocol: ?1
 ...
 ~~~
 {: title="Use of a TCP transport proxy through an HTTP request proxy"}
 
-Modern TCP transport proxies support requests that offer multiple IP addresses:
+A proxy can use the "use_template" proxy status error to reconfigure existing clients:
 
 ~~~ http-message
-CONNECT HTTP/2.0
-:authority = request-proxy.example
-:scheme = https
-:path = /proxy?target_host=192.0.2.1,2001:db8::1&tcp_port=443
-:protocol = connect-tcp
+GET /main?target_uri=https%3A%2F%2Fexample.com%2F HTTP/1.1
+Host: proxy.example.org
+Proxy-Authorization: ...
+Content-Type: message/ohttp-req
+...
+
+HTTP/1.1 200 OK
+Proxy-Status: proxy.example.org; \
+    use_template="https://proxy.example.org/beta{?target_uri}"; \
+    details="You have been assigned to the beta test group"
+Content-Type: message/ohttp-resp
 ...
 ~~~
-{: title="TCP transport proxy request with multiple IP addresses"}
+{: title="Updating the configured template with 'use_template'"}
+
+If the client's proxy configuration string was "proxy-foo.example.org:54321", the client will start by issuing a classic HTTP proxy request, but the proxy can use the "use_template" parameter to inform the client that it should use templated requests instead:
+
+~~~ http-message
+GET https://example.com/ HTTP/1.1
+Proxy-Authorization: ...
+Host: example.com
+Accept: text/html
+
+HTTP/1.1 400 Bad Request
+Proxy-Status: proxy-no-template.example.org; \
+    use_template="default"; \
+    error="http_request_denied"; \
+    details="Proxy template required"
+
+GET /http/https%3A%2F%2Fexample.com%2F HTTP/1.1
+Proxy-Authorization: ...
+Host: proxy-foo.example.org:54321
+Accept: text/html
+
+HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: ...
+...
+~~~
+{: title="Using 'use_template' to upgrade from classic to templated proxying"}
 
 # Security Considerations
 
@@ -208,19 +194,20 @@ None
 
 # Operational Considerations
 
-Modern HTTP proxies can make use of standard HTTP gateways and path-routing to ease implementation and allow use of shared infrastructure.  However, current gateways might need modifications to support these services.  To be compatible, a gateway must:
-
-* support Extended CONNECT.
-* convert HTTP/1.1 Upgrade requests into Extended CONNECT.
-* allow the CONNECT method to pass through to the origin.
-* forward Proxy-* request headers to the origin.
+Templated HTTP proxies can make use of standard HTTP gateways and path-routing to ease implementation and allow use of shared infrastructure.  To be compatible, a gateway must forward Proxy-* request headers to the origin.
 
 # IANA Considerations
 
-IF APPROVED, IANA is requested to add the following entry to the HTTP Upgrade Token Registry:
+IF APPROVED, IANA is requested to add the following entry to the "MASQUE URI Suffixes" registry:
 
-* Value: "connect-tcp"
-* Description: Proxying of TCP payloads
+| Path Segment | Description           | Reference       |
+| ------------ | --------------------- | --------------- |
+| http         | HTTP Request Proxying | (This document) |
+
+IF APPROVED, IANA is requested to add the following entry to the "HTTP Proxy Status Parameters" registry:
+
+* Name: use_template
+* Description: A URI Template that should be used for requests to this proxy server.  The special value "default" indicates that the client should use the default template for the configured proxy hostname (which is not known to the proxy).
 * Reference: (This document)
 
 --- back
