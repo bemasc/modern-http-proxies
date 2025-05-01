@@ -1,3 +1,4 @@
 # Automatically generated CODEOWNERS
 # Regenerate with `make update-codeowners`
-draft-schwartz-modern-http-proxies.md your.email@example.com
+draft-schwartz-httpbis-connect-tcp.md ietf@bemasc.net
+draft-schwartz-modern-http-proxies.md ietf@bemasc.net
