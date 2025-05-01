@@ -1,3 +1,5 @@
+<!-- regenerate: on (set to off if you edit this file) -->
+
 # HTTPBIS Drafts
 
 This is the working area for individual Internet-Drafts.
@@ -9,7 +11,7 @@ This is the working area for individual Internet-Drafts.
 * [Individual Draft](https://datatracker.ietf.org/doc/html/draft-schwartz-httpbis-connect-tcp)
 * [Compare Editor's Copy to Individual Draft](https://bemasc.github.io/modern-http-proxies/#go.draft-schwartz-httpbis-connect-tcp.diff)
 
-## Modernizing HTTP Forward Proxy Functionality
+## Template-Driven HTTP Request Proxying
 
 * [Editor's Copy](https://bemasc.github.io/modern-http-proxies/#go.draft-schwartz-modern-http-proxies.html)
 * [Datatracker Page](https://datatracker.ietf.org/doc/draft-schwartz-modern-http-proxies)
