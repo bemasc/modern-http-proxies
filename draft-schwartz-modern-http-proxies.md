@@ -157,7 +157,7 @@ HTTP/1.1 200 OK
 Proxy-Status: proxy.example.org; \
     use_template="https://proxy.example.org/beta{?target_uri}"; \
     details="You have been assigned to the beta test group"
-Content-Type: message/ohttp-resp
+Content-Type: message/ohttp-res
 ...
 ~~~
 {: title="Updating the configured template with 'use_template'"}
@@ -176,7 +176,7 @@ Proxy-Status: proxy-no-template.example.org; \
     error="http_request_denied"; \
     details="Proxy template required"
 
-GET /http/https%3A%2F%2Fexample.com%2F HTTP/1.1
+GET .well-known/masque/http/https%3A%2F%2Fexample.com%2F HTTP/1.1
 Proxy-Authorization: ...
 Host: proxy-foo.example.org:54321
 Accept: text/html
