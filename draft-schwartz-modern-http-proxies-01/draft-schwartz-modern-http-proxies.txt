@@ -4,8 +4,8 @@
 
 httpbis                                                   B. M. Schwartz
 Internet-Draft                                      Meta Platforms, Inc.
-Intended status: Standards Track                              1 May 2025
-Expires: 2 November 2025
+Intended status: Standards Track                              2 May 2025
+Expires: 3 November 2025
 
 
                  Template-Driven HTTP Request Proxying
@@ -35,7 +35,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 2 November 2025.
+   This Internet-Draft will expire on 3 November 2025.
 
 Copyright Notice
 
@@ -241,7 +241,7 @@ Table of Contents
    Proxy-Status: proxy.example.org; \
        use_template="https://proxy.example.org/beta{?target_uri}"; \
        details="You have been assigned to the beta test group"
-   Content-Type: message/ohttp-resp
+   Content-Type: message/ohttp-res
    ...
 
        Figure 4: Updating the configured template with 'use_template'
@@ -263,7 +263,7 @@ Table of Contents
        error="http_request_denied"; \
        details="Proxy template required"
 
-   GET /http/https%3A%2F%2Fexample.com%2F HTTP/1.1
+   GET .well-known/masque/http/https%3A%2F%2Fexample.com%2F HTTP/1.1
    Proxy-Authorization: ...
    Host: proxy-foo.example.org:54321
    Accept: text/html
